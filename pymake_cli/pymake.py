@@ -1,11 +1,11 @@
 import os
 import yaml
 import subprocess
-import build_file
+from . import build_file
 
 
 class PyMake:
-    command:str = None
+    command = ""
     debug_mode = False
     config:dict = {}
 
@@ -14,7 +14,7 @@ class PyMake:
             self.config = yaml.safe_load(f)
         self.debug_mode = options.get("-d", False)
 
-    def add_flags(self, flag, arguments, add_slash=True):
+    def add_flags(self, flag, arguments, add_slash=True, add_dash=True):
         """
         Add flags to the command.
 
@@ -23,9 +23,10 @@ class PyMake:
         - arguments (list): A list of arguments to add to the command.
         - add_slash (bool): Whether to add a slash after each argument.
         """
+        dash = "-" if add_dash else ""
         # Add flags
         for arg in arguments:
-            self.command += f' -{flag}{arg}'
+            self.command += f' {dash}{flag}{arg}'
             if add_slash:
                 self.command += " / \n"
             elif arguments[-1] == arg:
@@ -39,13 +40,21 @@ class PyMake:
         if self.config == {}:
             self.debug_print("Config is empty")
             exit(2)
+        
+        self.command = f"{self.config['compiler']} -o {self.config['output']} "
 
         self.debug_print("Building " + self.config["name"])
+        actions_in_order = [
+            "files",
+            "source",
+            "includes",
+            "libs",
+            "libraries",
+            "flags",
+        ]
         actions = {
             "compiler": lambda x: f'{x}',
-            "files": lambda x: self.add_flags("", x),
-            "source": lambda x: f'"{x}" / \n',
-            "output": lambda x: f'-o "{x}"',
+            "files": lambda x: self.add_flags("", x, add_dash=False),
             "includes": lambda x: self.add_flags("I", x),
             "libs": lambda x: self.add_flags("L", x),
             "libraries": lambda x: self.add_flags("l", x),
@@ -53,13 +62,16 @@ class PyMake:
         }
 
         # Apply transformations
-        for key, value in self.config:
-            actions[key](value)
-        
+        for action in actions_in_order:
+            if action in self.config:
+                actions[action](self.config[action])
+
+        # Add source
+
         # Print command
         print(self.command)
         # Remove pretty print
-        command = command.replace("/ \n", " ")
+        self.command = self.command.replace("/ \n", " ")
         
     def run(self):
         # Call command and check if command has output
@@ -90,7 +102,7 @@ class PyMakeCLI:
             exit(1)
         # We got args, must be in this format: pymake.py <command> <command_args> [options]
         self.command = args[0]
-        self.command_args = args[1:].split(" ")
+        self.command_args = args[1:]
         if len(self.command_args) == 0:
             print("No arguments specified")
             exit(1)
@@ -115,15 +127,7 @@ class PyMakeCLI:
         # Build the project
         pymake = PyMake()
         pymake.read_args(self.command_args[0], self.options)
+        pymake.build()
+        pymake.run()
 
 
-def main():
-    cli = PyMakeCLI()
-    cli.get_args()
-    if cli.command == "create":
-        cli.create_config()
-    elif cli.command == "build":
-        cli.build()
-    else:
-        print("Command not found")
-        exit(4)

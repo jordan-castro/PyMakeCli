@@ -1,9 +1,8 @@
 from setuptools import setup, find_packages
 
-
 setup(
     name='pymake_cli',
-    version='0.1.1',
+    version='0.1.5',
     author='Jordan Castro',
     author_email='jordan@grupojvm.com',
     packages=find_packages(),
@@ -17,7 +16,7 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'pymake=pymake.pymake:main'
+            'pymake-cli=pymake_cli.pymake_cli:main'
         ]
     }
 )
