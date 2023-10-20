@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pymake_cli',
-    version='0.1.0',
+    version='0.1.1',
     author='Jordan Castro',
     author_email='jordan@grupojvm.com',
     packages=find_packages(),

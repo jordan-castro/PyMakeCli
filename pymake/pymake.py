@@ -117,7 +117,7 @@ class PyMakeCLI:
         pymake.read_args(self.command_args[0], self.options)
 
 
-if __name__ == "__main__":
+def main():
     cli = PyMakeCLI()
     cli.get_args()
     if cli.command == "create":
