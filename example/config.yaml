@@ -1,0 +1,36 @@
+
+# This handles building the project
+
+# Change to whatever will compile your c/c++ code. You can even use emscripten!
+compiler: g++  
+
+# The name of the project, used for debugging.
+name: App name 
+
+# The output file.
+output: app.exe
+
+# Should the program run after building?
+run: true 
+
+# These are the flags that will be passed to the compiler, such as -std=c++17
+flags:
+    - std=c++17
+
+# The c/c++ files that will be compiled in order.
+files:
+    - src/utils.cpp
+    - src/main.cpp # Should be the last file
+
+# Where are the header files located?
+includes:
+    - src/include/
+
+# # Not to be confused with libraries, these are the paths to the libraries.
+# libs:
+#     - path/to/lib
+
+# # These are the libraries that will be linked to the project. Path must be specified in libs.
+# libraries: 
+#     - library
+
