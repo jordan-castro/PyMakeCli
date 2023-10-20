@@ -31,3 +31,5 @@ dist/
 __pycache__/
 
 .pypirc
+
+env/
