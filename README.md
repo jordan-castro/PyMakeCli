@@ -6,23 +6,23 @@ Rather it is an automation to be used instead of CMake but if you know CMake the
 ## Installation
 
 ```bash
-pip install pymake_cli
+pip install pymake-cli
 ```
 
 ## Usage
 
 ```bash
-pymake --help
+pymakecli --help
 ```
 
 ## Example
 
 ```bash
-pymake build config.yaml
+pymakecli build config.yaml
 ```
 
 ## Create a config file
 
 ```bash
-pymake create config.yaml
+pymakecli create config.yaml
 ```
