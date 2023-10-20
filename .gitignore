@@ -1,0 +1,33 @@
+# This is a gitignore file for a python pip module
+
+# Ignore the build directory
+build/
+
+# Ignore the dist directory
+dist/
+
+# Ignore the egg directory
+*.egg-info/
+
+# Ignore the .idea directory
+.idea/
+
+# Ignore the .pytest_cache directory
+.pytest_cache/
+
+# Ignore the .tox directory
+.tox/
+
+# Ignore the .vscode directory
+.vscode/
+
+# Ignore the .DS_Store file
+.DS_Store
+
+# Ignore the .coverage file
+.cov
+
+# Ignore pycache   
+__pycache__/
+
+.pypirc
