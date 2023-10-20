@@ -1,3 +1,5 @@
-python setup.py sdist
+@ECHO OFF
+
+CALL build.bat
 
 twine upload -r pypi dist/*
