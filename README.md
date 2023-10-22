@@ -48,8 +48,8 @@ pymake-cli update <config_file_path>
 
 ### Options
 On each command you can specify the following options:
-    - `<config_file_path>`: The path to the `.yaml` file.
-    - `-d` or `--debug`: This will print debug information.
+- `<config_file_path>`: The path to the `.yaml` file.
+- `-d` or `--debug`: This will print debug information.
 
 The `-s` or `--shell` option allows you to run shell commands as defined in the config file.
 ### Try it out
