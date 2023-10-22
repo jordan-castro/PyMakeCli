@@ -11,7 +11,8 @@ flags:
 
 # The c/c++ files that will be compiled in order. 
 files: 
-    - main.cpp
+    - src/utils.cpp
+    - src/main.cpp
 
 # Where are the header files located?
 includes:
