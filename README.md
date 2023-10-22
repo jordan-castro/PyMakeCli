@@ -71,3 +71,7 @@ cd example
 pymake-cli build
 pymake-cli run
 ```
+
+
+### Things I am working on
+- [ ] Update command. The current command leaves the new config file disorganized.
