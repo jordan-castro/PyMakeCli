@@ -1,7 +1,6 @@
-import os
 import yaml
 import subprocess
-from . import build_file
+from . import utils
 
 
 class PyMake:
@@ -9,10 +8,22 @@ class PyMake:
     debug_mode = False
     config:dict = {}
 
-    def read_args(self, build_file, options):
-        with open(build_file, 'r') as f:
+    def __init__(self, config_file="config.yaml", debug_mode=False):
+        self.debug_mode = debug_mode
+        self.load_config(config_file)
+
+    def load_config(self, config_file):
+        if not config_file.endswith(".yaml"):
+            utils.debug_print("Config file must be a .yaml file", self.debug_mode)
+            exit(1)
+
+        # Check file exists
+        if not utils.file_exists(config_file):
+            utils.debug_print(f"File {config_file} does not exist", self.debug_mode)
+            exit(1)
+
+        with open(config_file, 'r') as f:
             self.config = yaml.safe_load(f)
-        self.debug_mode = options.get("-d", False)
 
     def add_flags(self, flag, arguments, add_slash=True, add_dash=True):
         """
@@ -32,21 +43,16 @@ class PyMake:
             elif arguments[-1] == arg:
                     break
 
-    def debug_print(self, data):
-        if self.debug_mode:
-            print(f"Debugging: {data}")
-
     def build(self):
         if self.config == {}:
-            self.debug_print("Config is empty")
+            utils.debug_print("Config is empty", self.debug_mode)
             exit(2)
         
         self.command = f"{self.config['compiler']} -o {self.config['output']} "
 
-        self.debug_print("Building " + self.config["name"])
+        utils.debug_print("Building " + self.config["name"], self.debug_mode)
         actions_in_order = [
             "files",
-            "source",
             "includes",
             "libs",
             "libraries",
@@ -66,68 +72,49 @@ class PyMake:
             if action in self.config:
                 actions[action](self.config[action])
 
-        # Add source
-
         # Print command
         print(self.command)
         # Remove pretty print
         self.command = self.command.replace("/ \n", " ")
-        
-    def run(self):
         # Call command and check if command has output
         # If it does, it failed
         res = subprocess.call(self.command, shell=True)
         if res != 0:
-            self.debug_print("Build failed")
+            utils.debug_print("Build failed", self.debug_mode)
             exit(3)
-        # Build succeeded, run program
-        self.debug_print("Build succeeded")
-        if self.config.get("run", False):
-            self.debug_print("Running program")
+        
+        # Build succeeded
+        utils.debug_print("Build succeeded", self.debug_mode)
 
-            # Run program
-            build = self.config['output'].replace("/", "\\")
-            subprocess.call(build, shell=True)
+    def run(self):
+        utils.debug_print("Running program", self.debug_mode)
+        # Run program
+        build = self.config['output'].replace("/", "\\")
+        subprocess.call(build, shell=True)
 
+    def run_shell_commands(self):
+        # This is to run shell commands separately from building
+        utils.debug_print("Running shell commands", self.debug_mode)
+        if "shell" in self.config:
+            shells = self.config["shell"].get("before", []) + self.config["shell"].get("after", [])
+            self.run_shell(shells)
 
-class PyMakeCLI:
-    command:str = None
-    command_args:list = []
-    options:dict = {}
+    def run_shell(self, shells):
+        for shell in shells:
+            utils.debug_print(shell, self.debug_mode)
+            subprocess.call(shell, shell=True)
+    
+    def build_with_shell(self):
+        # Run the before shell commands
+        # run build
+        # Run the after shell commands
+        shells = self.config.get("shell", [])
+        before = shells.get("before", [])
+        after = shells.get("after", [])
 
-    def get_args(self):
-        args = os.sys.argv[1:]
-        if len(args) == 0:
-            print("No commmand specified")
-            exit(1)
-        # We got args, must be in this format: pymake.py <command> <command_args> [options]
-        self.command = args[0]
-        self.command_args = args[1:]
-        if len(self.command_args) == 0:
-            print("No arguments specified")
-            exit(1)
-            
-        self.options = self.parse_options()
-
-    def parse_options(self):
-        options = {}
-        # If arg starts with "-", it's an option
-        for arg in self.command_args:
-            if arg.startswith("-"):
-                options[arg] = True
-        return options
-
-    def create_config(self):
-        # pymake.py create <config_name>
-        # Create a .yaml file at the current directory
-        build_file.build_file(self.command_args[0])
-
-    def build(self):
-        # pymake.py build <config_name>
-        # Build the project
-        pymake = PyMake()
-        pymake.read_args(self.command_args[0], self.options)
-        pymake.build()
-        pymake.run()
-
-
+        # Run before shell commands
+        self.run_shell(before)
+        # Build
+        self.build()
+        # Run after shell commands
+        self.run_shell(after)
