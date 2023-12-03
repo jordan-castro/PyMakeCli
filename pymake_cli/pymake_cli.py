@@ -7,7 +7,7 @@ from . import utils
 
 
 @click.command()
-@click.argument('config_name')
+@click.argument('config_file', required=False, default="config.yaml")
 @click.option('-d', '--debug', is_flag=True, help='Enable debug mode')
 def init(config_name, debug):
     # Check that it is a existing path
