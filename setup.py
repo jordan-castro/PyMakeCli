@@ -5,6 +5,7 @@ setup(
     version='0.1.6',
     author='Jordan Castro',
     author_email='jordan@grupojvm.com',
+    description='**PyMake** is a simple build tool for C/C++ projects.',
     packages=find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',
